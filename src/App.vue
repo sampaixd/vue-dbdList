@@ -2,7 +2,6 @@
 import TheHeader from './components/TheHeader.vue'
 import FilterTable from './components/FilterTable.vue'
 import KillerTable from './components/KillerTable.vue'
-import { FilterDifficulty } from './external/FilterAlgorithms'
 </script>
 
 <template>
@@ -11,7 +10,7 @@ import { FilterDifficulty } from './external/FilterAlgorithms'
   </header>
 
   <main>
-    <FilterTable :allKillers="allKillers"> @killers="killers=$event" </FilterTable>
+    <FilterTable :allKillers="allKillers" @filterChanged="changeKillerList"></FilterTable>
     <KillerTable :killers="killers"></KillerTable>
   </main>
 </template>
@@ -95,7 +94,10 @@ export default {
     }
   },
   methods: {
-
+    changeKillerList(killers) {
+      console.log("updating killer list");
+      this.killers = killers;
+    }
   },
   beforeMount() {
     console.log("creating killer list");

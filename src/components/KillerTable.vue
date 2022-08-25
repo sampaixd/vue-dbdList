@@ -1,11 +1,5 @@
 <template lang="">
     <div>
-        <select v-model="sortOption">
-        <option value="name">name</option>
-        <option value="rating">rating</option>
-        <option value="difficulty">difficulty</option>
-        </select>
-        <button @click="Sort">meow</button>
         <table class="killerTable">
             <tr class="column">
                 <th @click="Sort($event, 'name')">
@@ -28,13 +22,12 @@
 <script>
 
 
-import { SortByName, SortByRating, SortByDifficulty } from "../external/SortingAlgorithms.js";
 export default {
     props: ["killers"],
     data() {
         return {
-            sortOption: "name",
-            currentSort: "name",
+            sortOption: "",
+            currentSort: "",
             reverseSort: 1,
         }
     },
@@ -49,15 +42,58 @@ export default {
                 this.reverseSort *= -1;
             }
             if (sortOption === "name") {
-                this.killers = SortByName(this.killers, this.reverseSort);
+                this.killers = this.SortByName(this.killers, this.reverseSort);
             }
             else if (sortOption === "rating") {
-                this.killers = SortByRating(this.killers, this.reverseSort);
+                this.killers = this.SortByRating(this.killers, this.reverseSort);
             }
             else {
-                this.killers = SortByDifficulty(this.killers, this.reverseSort);
+                this.killers = this.SortByDifficulty(this.killers, this.reverseSort);
             }
         },
+
+        SortByName(killers, reverseSort) {
+            killers.sort((a, b) => {
+                const nameA = a.name.toUpperCase();
+                const nameB = b.name.toUpperCase();
+                if (nameA < nameB) {
+                    return 1 * reverseSort;
+                }
+                if (nameA > nameB) {
+                    return -1 * reverseSort;
+                }
+
+                return 0;
+            });
+            return killers;
+        },
+
+        SortByRating(killers, reverseSort) {
+            killers.sort((a, b) => {
+                if (a.rating.id < b.rating.id) {
+                    return -1 * reverseSort
+                }
+                else if (a.rating.id > b.rating.id) {
+                    return 1 * reverseSort;
+                }
+
+                return 0;
+            });
+            return killers;
+        },
+
+        SortByDifficulty(killers, reverseSort) {
+            killers.sort((a, b) => {
+                if (a.difficulty.id < b.difficulty.id) {
+                    return -1 * reverseSort;
+                }
+                else if (a.difficulty.id > b.difficulty.id) {
+                    return 1 * reverseSort;
+                }
+                return 0;
+            });
+            return killers;
+        }
 
     },
     computed: {
@@ -73,7 +109,7 @@ export default {
             return this.sortOption === "difficulty" && 0 < this.reverseSort;
         }
     },
-    
+
 }
 </script>
 <style scoped>

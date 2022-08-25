@@ -5,7 +5,7 @@
 
             <div class="category">
                 <span class="title">Name</span>
-                <input type="text" class="nameFilter">
+                <input v-model="activeNameFilter" v-on:input="ChangeNameFilter" type="text" class="nameFilter">
             </div>
             <div class="category">
                 <span class="title">Rating</span>
@@ -33,12 +33,11 @@
     </div>
 </template>
 <script>
-import { FilterRanks, FilterDifficulty } from '../external/FilterAlgorithms';
 export default {
     props: ['allKillers'],
     data() {
         return {
-
+            activeNameFilter: "",
 
             activeRatings: [
                 "bad",
@@ -57,9 +56,19 @@ export default {
     },
 
     methods: {
+
+        testMethod() {
+
+        },
+
+        ChangeNameFilter() {
+            this.killers = this.filterKillers(this.allKillers, this.activeNameFilter, this.activeRatings, this.activeDifficulties);
+            this.$emit('filterChanged', this.killers);
+        },
+
         ChangeRatingFilter(selectedFilter) {
             let selectedFilterIndex = this.activeRatings.indexOf(selectedFilter);
-            
+
             if (selectedFilterIndex > -1) {
                 this.activeRatings.splice(selectedFilterIndex, 1);
             }
@@ -67,13 +76,13 @@ export default {
             else {
                 this.activeRatings.push(selectedFilter);
             }
-            this.killers = FilterRanks(this.allKillers, this.activeRatings);
-            this.$emit('killers', this.killers);
+            this.killers = this.filterKillers(this.allKillers, this.activeNameFilter, this.activeRatings, this.activeDifficulties);
+            this.$emit('filterChanged', this.killers);
         },
 
         ChangeDifficultyFilter(selectedFilter) {
             let selectedFilterIndex = this.activeDifficulties.indexOf(selectedFilter);
-            
+
             if (selectedFilterIndex > -1) {
                 this.activeDifficulties.splice(selectedFilterIndex, 1);
             }
@@ -81,8 +90,17 @@ export default {
             else {
                 this.activeDifficulties.push(selectedFilter);
             }
-            this.killers = FilterDifficulty(this.allKillers, this.activeDifficulties);
-            this.$emit('killers', this.killers);
+            //this.killers = FilterDifficulty(this.allKillers, this.activeDifficulties);
+            //this.killers = FilterRanks(this.killers, this.activeRatings);
+            this.killers = this.filterKillers(this.allKillers, this.activeNameFilter, this.activeRatings, this.activeDifficulties);
+            this.$emit('filterChanged', this.killers);
+        },
+
+        filterKillers(killerList, nameFilter, ratingFilter, difficultyFilter) {
+            return killerList.filter((killer) =>
+                ratingFilter.includes(killer.rating.str) &&
+                difficultyFilter.includes(killer.difficulty.str) &&
+                killer.name.toLowerCase().indexOf(nameFilter) != -1);
         }
     }
 }
